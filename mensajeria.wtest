@@ -1,8 +1,47 @@
 import mensajeria.*
 import mensajeros.*
 
+describe "2 " {
+  test "contratar" {
+    mensajeria.contratar(morfeo)
+    mensajeria.contratar(neo)
+    assert.equals([morfeo, neo], mensajeria.mensajeros())
+  }
+  
+  test "despedir" {
+    mensajeria.contratar(morfeo)
+    mensajeria.contratar(neo)
+    mensajeria.despedir(morfeo)
+    assert.equals([neo], mensajeria.mensajeros())
+  }
 
-describe "2 " {}
+  test "despedir a todos" {
+    mensajeria.contratar(morfeo)
+    mensajeria.contratar(neo)
+    mensajeria.despedirATodos()
+    assert.equals(true, mensajeria.mensajeros().isEmpty())
+  }
+  test "es grande" {
+    mensajeria.contratar(morfeo)
+    mensajeria.contratar(neo)
+    assert.notThat(mensajeria.esGrande())
+    mensajeria.contratar(trinity)
+    assert.that(mensajeria.esGrande())
+  }
+  test "puede ser entregado por el primero" {
+    mensajeria.contratar(morfeo)
+    mensajeria.contratar(neo)
+    paquete.destino(puente)
+    paquete.pagar()
+    assert.that(mensajeria.puedeSerEntregadoPorElPrimero())
+  }
+  test "peso del ultimo" {
+    mensajeria.contratar(morfeo)
+    mensajeria.contratar(trinity)
+    assert.equals(900, mensajeria.pesoDelUltimo())
+  }
+}
 
-
-describe "3 " {}
+describe "3 " {
+  
+}
