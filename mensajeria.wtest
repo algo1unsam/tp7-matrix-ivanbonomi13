@@ -14,13 +14,14 @@ describe "2 " {
     mensajeria.despedir(morfeo)
     assert.equals([neo], mensajeria.mensajeros())
   }
-
+  
   test "despedir a todos" {
     mensajeria.contratar(morfeo)
     mensajeria.contratar(neo)
     mensajeria.despedirATodos()
-    assert.equals(true, mensajeria.mensajeros().isEmpty())
+    assert.that(mensajeria.mensajeros().isEmpty())
   }
+  
   test "es grande" {
     mensajeria.contratar(morfeo)
     mensajeria.contratar(neo)
@@ -28,6 +29,7 @@ describe "2 " {
     mensajeria.contratar(trinity)
     assert.that(mensajeria.esGrande())
   }
+  
   test "puede ser entregado por el primero" {
     mensajeria.contratar(morfeo)
     mensajeria.contratar(neo)
@@ -35,6 +37,7 @@ describe "2 " {
     paquete.pagar()
     assert.that(mensajeria.puedeSerEntregadoPorElPrimero())
   }
+  
   test "peso del ultimo" {
     mensajeria.contratar(morfeo)
     mensajeria.contratar(trinity)
@@ -43,5 +46,102 @@ describe "2 " {
 }
 
 describe "3 " {
+  test "Paquete puede ser entregado por la empresa" {
+    mensajeria.contratar(trinity)
+    mensajeria.contratar(morfeo)
+    mensajeria.contratar(neo)
+    paqueton.agregarDestino(matrix)
+    paqueton.agregarDestino(puente)
+    paqueton.pagar(200)
+    assert.that(mensajeria.puedeSerEntregado(paqueton))
+  }
   
+  test "Mensajeros que pueden llevar un paquete" {
+    mensajeria.contratar(trinity)
+    mensajeria.contratar(morfeo)
+    mensajeria.contratar(neo)
+    paqueton.agregarDestino(matrix)
+    paqueton.agregarDestino(puente)
+    paqueton.pagar(200)
+    assert.equals([trinity, neo], mensajeria.mensajerosQuePueden(paqueton))
+  }
+  
+  test "Tiene sobrepeso" {
+    mensajeria.contratar(trinity)
+    mensajeria.contratar(morfeo)
+    assert.that(mensajeria.tieneSobrepeso())
+    mensajeria.contratar(neo)
+    assert.notThat(mensajeria.tieneSobrepeso())
+  }
+  
+  test "Enviar un paquete entregable" {
+    mensajeria.contratar(trinity)
+    mensajeria.enviar(paquetito)
+    assert.that(mensajeria.enviados().contains(paquetito))
+  }
+  
+  test "Paquete no entregable queda pendiente" {
+    paqueton.agregarDestino(matrix)
+    paqueton.pagar(50)
+    "no totalmente pagado"
+    mensajeria.enviar(paqueton)
+    assert.that(mensajeria.pendientes().contains(paqueton))
+  }
+  
+  test "Facturación de la empresa" {
+    mensajeria.contratar(trinity)
+    
+    paquete.destino(puente)
+    paquete.pagar()
+    paqueton.agregarDestino(puente)
+    paqueton.agregarDestino(matrix)
+    paqueton.pagar(200)
+    
+    mensajeria.enviarTodos([paquete, paqueton])
+    
+    assert.equals(250, mensajeria.facturacion())
+  }
+  
+  test "Enviar todos los paquetes" {
+    mensajeria.contratar(trinity)
+    paqueton.agregarDestino(puente)
+    paqueton.pagar(100)
+    mensajeria.enviarTodos([paquetito, paqueton])
+    assert.that(mensajeria.enviados().contains(paquetito))
+    assert.that(mensajeria.enviados().contains(paqueton))
+  }
+  
+  test "Enviar paquete pendiente más caro" {
+    mensajeria.contratar(morfeo)
+    camion.acoplados(3)
+    paquete.destino(matrix)
+    paquete.pagar()
+    mensajeria.enviar(paquete)
+    paqueton.agregarDestino(puente)
+    paqueton.pagar(100)
+    mensajeria.enviar(paqueton)
+    assert.that(mensajeria.pendientes().contains(paqueton))
+    assert.that(mensajeria.pendientes().contains(paquete))
+    mensajeria.contratar(trinity)
+    mensajeria.enviarPendienteMasCaro()
+    assert.that(mensajeria.enviados().contains(paqueton))
+    assert.notThat(mensajeria.pendientes().contains(paqueton))
+    assert.that(mensajeria.pendientes().contains(paquete))
+  }
+}
+
+describe "adicional" {
+  test "Nuevo mensajero y paquete express" {
+    mensajeria.contratar(cypher)
+    express.destino(matrix)
+    assert.notThat(mensajeria.puedeSerEntregado(express))
+    
+    express.pagar()
+    assert.notThat(mensajeria.puedeSerEntregado(express))
+    
+    express.destino(puente)
+    assert.that(mensajeria.puedeSerEntregado(express))
+    mensajeria.enviar(express)
+    assert.that(mensajeria.enviados().contains(express))
+  }
 }
